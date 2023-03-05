@@ -20,7 +20,7 @@ public class SendEmailUtil {
 
     //发件人邮箱密码（授权码）
     //在开启SMTP服务时会获取到一个授权码，把授权码填在这里
-    private static String myEmailPassword = "cspyhaclxvcadife";
+    private static String myEmailPassword = "";
 
     // 发送邮件
     public static void sendEmail(String toEmailAddress, String content) throws Exception {
@@ -75,7 +75,7 @@ public class SendEmailUtil {
         msg.setContent(builder.toString(), "text/html;charset=UTF-8");
         //设置发件人邮箱
         // InternetAddress 的三个参数分别为: 发件人邮箱, 显示的昵称(只用于显示, 没有特别的要求), 昵称的字符集编码
-        msg.setFrom(new InternetAddress(myEmailAccount, "autoGrabbingSeat", "UTF-8"));
+        msg.setFrom(new InternetAddress(myEmailAccount, "自己", "UTF-8"));
 
         //得到邮差对象
         Transport transport = session.getTransport();

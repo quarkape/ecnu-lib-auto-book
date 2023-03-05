@@ -18,13 +18,13 @@ public class AutoSeatGrabbing {
     private static final String SCHOOL = "ecnu";
     // 学校全称
     private static final String SCHOOL_NAME = "华东师范大学";
-    // openId，似乎是固定的
-    private static final String OPENID = "o7Fd1szRPICMBFinyxERnUWs5RT0";
+    // openId，是固定的
+    private static final String OPENID = "";
     // 用户密码
-    private static final String PASSWORD = "19980510Wh";
+    private static final String PASSWORD = "123456789";
     // 用户名（学号）
-    private static final String USERNAME = "51214108037";
-    // 希望发送的邮箱
+    private static final String USERNAME = "512141080xx";
+    // 希望发送的邮箱，建议使用qq邮箱，然后在微信上绑定qq邮箱，这样每次预约之后能够收到预约结果
     private static final String EMAIL = "quarkape@qq.com";
     private static HttpURLConnection con = null;
     private static BufferedReader bufferedReader = null;
@@ -33,8 +33,8 @@ public class AutoSeatGrabbing {
     private static SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd");
     // 猜测是操作的类型，1为预约座位
     private static final String TYPE = "1";
-    // 缺省座位id
-    private static final String SEAT_ID = "6166";
+    // 默认座位id，可以修改
+    private static final String SEAT_ID = "xxxx";
 
     // 自定义抢座
     public static void autoGrabSeat() throws Exception {
@@ -43,7 +43,7 @@ public class AutoSeatGrabbing {
         calendar.setTime(new Date());
         calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
         String tomorrow = formatter.format(calendar.getTime());
-        String content = "<div>预约位置：中北图书馆一楼B区55号</div><div>位置id：6166</div><div>预约日期：" + tomorrow + "</div>";
+        String content = "<div>预约位置：xxxx</div><div>位置id：" + SEAT_ID + "</div><div>预约日期：" + tomorrow + "</div>";
         // 开始预约
         // 先登出当前用户
         Boolean hasLogOut = removeUser();
@@ -65,10 +65,8 @@ public class AutoSeatGrabbing {
             SendEmailUtil.sendEmail(EMAIL, content);
             return;
         }
-        // 6166:中北一楼B区55号座位
         // 默认type为1
-//        HashMap<String, String> res = grabSeat(map.get("accessToken"), TYPE, map1.get("segment"), SEAT_ID);
-        HashMap<String, String> res = grabSeat(map.get("accessToken"), TYPE, "1425771", SEAT_ID);
+        HashMap<String, String> res = grabSeat(map.get("accessToken"), TYPE, map1.get("segment"), SEAT_ID);
         if (res.get("status") == "1") {
             content = "预约结果：预约成功！" + content;
         } else {
@@ -97,7 +95,7 @@ public class AutoSeatGrabbing {
         return map;
     }
 
-    // skalibrary添加用户信息（猜测有了这个信息才能过闸）
+    // skalibrary添加用户信息
     public static Boolean addUser(String name, String card, String deptName, String gender, String roleName) throws IOException {
         String paramsStr = "openid=" + OPENID + "&username=" + USERNAME + "&password=" + PASSWORD + "&name=" + name + "&card=" + card + "&deptName=" + deptName + "&gender=" + gender + "&roleName=" + roleName + "&school=" + SCHOOL + "&schoolName=" + SCHOOL_NAME;
         JSONObject obj = requestPost(SKALIB_URL + "/addUser", paramsStr);
@@ -112,7 +110,7 @@ public class AutoSeatGrabbing {
 
     // 抢座
     // type : 操作类型 : 1 : 预约座位
-    // setId : 座位id : 6166
+    // setId : 座位id : 6056
     public static HashMap<String, String> grabSeat(String accessToken, String type, String segment, String seatId) throws IOException {
         String paramStr = "access_token=" + accessToken + "&userid=" + USERNAME + "&type=" + type + "&id=" + seatId + "&segment=" + segment;
         JSONObject obj = requestPost(BASE_URL + "/spaces/" + seatId + "/book", paramStr);
@@ -197,8 +195,6 @@ public class AutoSeatGrabbing {
 
     // 请求配置
     public static JSONObject requestConfig(String oriUrl, String method, String paramsStr) throws IOException {
-        System.out.println("请求地址：" + oriUrl);
-        System.out.println("请求参数： " + paramsStr);
         URL url = new URL(oriUrl);
         con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod(method);
@@ -222,7 +218,6 @@ public class AutoSeatGrabbing {
             while ((line = bufferedReader.readLine()) != null) {
                 stringBuffer.append(line);
             }
-            System.out.println("结果：" + stringBuffer.toString());
             res = JSONObject.parseObject(stringBuffer.toString());
         } else {
             res = new JSONObject();

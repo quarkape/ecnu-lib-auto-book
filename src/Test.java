@@ -9,6 +9,5 @@ public class Test {
 
     public static void main(String[] args) throws Exception {
         AutoSeatGrabbing.autoGrabSeat();
-//        SendEmailUtil.sendEmail("quarkape@qq.com", "ceshi");
     }
 }
