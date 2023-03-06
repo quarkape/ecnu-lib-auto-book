@@ -21,11 +21,11 @@ public class AutoSeatGrabbing {
     // openId，是固定的
     private static final String OPENID = "";
     // 用户密码
-    private static final String PASSWORD = "123456789";
+    private static final String PASSWORD = "";
     // 用户名（学号）
-    private static final String USERNAME = "512141080xx";
+    private static final String USERNAME = "";
     // 希望发送的邮箱，建议使用qq邮箱，然后在微信上绑定qq邮箱，这样每次预约之后能够收到预约结果
-    private static final String EMAIL = "quarkape@qq.com";
+    private static final String EMAIL = "";
     private static HttpURLConnection con = null;
     private static BufferedReader bufferedReader = null;
     private static InputStream inputStream = null;
@@ -34,16 +34,16 @@ public class AutoSeatGrabbing {
     // 猜测是操作的类型，1为预约座位
     private static final String TYPE = "1";
     // 默认座位id，可以修改
-    private static final String SEAT_ID = "xxxx";
+    private static final String SEAT_ID = "";
 
-    // 自定义抢座
+    // 自动预约
     public static void autoGrabSeat() throws Exception {
         // 获取明天日期
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
         String tomorrow = formatter.format(calendar.getTime());
-        String content = "<div>预约位置：xxxx</div><div>位置id：" + SEAT_ID + "</div><div>预约日期：" + tomorrow + "</div>";
+        String content = "<div>位置id：" + SEAT_ID + "</div><div>预约日期：" + tomorrow + "</div>";
         // 开始预约
         // 先登出当前用户
         Boolean hasLogOut = removeUser();
@@ -74,7 +74,7 @@ public class AutoSeatGrabbing {
             SendEmailUtil.sendEmail(EMAIL, content);
             return;
         }
-        SendEmailUtil.sendEmail(EMAIL, "<div>预约结果：预约成功！</div>" + content + "<div>莫等闲，白了少年头，空悲切！</div>");
+        SendEmailUtil.sendEmail(EMAIL, "<div>预约结果：预约成功！</div>" + content + "<div><b>莫等闲，白了少年头，空悲切！</b></div>");
     }
 
     // 用户登录
@@ -95,20 +95,20 @@ public class AutoSeatGrabbing {
         return map;
     }
 
-    // skalibrary添加用户信息
+    // skalibrary绑定用户
     public static Boolean addUser(String name, String card, String deptName, String gender, String roleName) throws IOException {
         String paramsStr = "openid=" + OPENID + "&username=" + USERNAME + "&password=" + PASSWORD + "&name=" + name + "&card=" + card + "&deptName=" + deptName + "&gender=" + gender + "&roleName=" + roleName + "&school=" + SCHOOL + "&schoolName=" + SCHOOL_NAME;
         JSONObject obj = requestPost(SKALIB_URL + "/addUser", paramsStr);
         return obj.getBoolean("status");
     }
 
-    // skalibrary登录用户
+    // skalibrary解除绑定
     public static Boolean removeUser() throws IOException {
         JSONObject obj = requestPost(SKALIB_URL + "/removeUser", "openid=" + OPENID);
         return obj.getBoolean("status");
     }
 
-    // 抢座
+    // 预约
     // type : 操作类型 : 1 : 预约座位
     // setId : 座位id : 6056
     public static HashMap<String, String> grabSeat(String accessToken, String type, String segment, String seatId) throws IOException {
