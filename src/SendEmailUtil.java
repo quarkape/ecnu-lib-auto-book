@@ -16,7 +16,7 @@ public class SendEmailUtil {
     private static String myEmailSMTPHost = "smtp.qq.com";
 
     //发件人邮箱
-    private static String myEmailAccount = "quarkape@qq.com";
+    private static String myEmailAccount = "";
 
     //发件人邮箱密码（授权码）
     //在开启SMTP服务时会获取到一个授权码，把授权码填在这里
