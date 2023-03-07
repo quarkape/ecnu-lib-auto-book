@@ -36,6 +36,11 @@ public class AutoSeatGrabbing {
     // 默认座位id，可以修改
     private static final String SEAT_ID = "";
 
+    // 主函数
+    public static void main(String[] args) throws Exception {
+        autoGrabSeat();
+    }
+
     // 自动预约
     public static void autoGrabSeat() throws Exception {
         // 获取明天日期
@@ -44,21 +49,33 @@ public class AutoSeatGrabbing {
         calendar.set(Calendar.DATE, calendar.get(Calendar.DATE) + 1);
         String tomorrow = formatter.format(calendar.getTime());
         String content = "<div>位置id：" + SEAT_ID + "</div><div>预约日期：" + tomorrow + "</div>";
-        // 开始预约
-        // 先登出当前用户
-        Boolean hasLogOut = removeUser();
+
+        /**
+         * 解除当前用户绑定
+         * 如果已经在公众号上面绑定了，可以不用调用下面这行代码
+         */
+//        Boolean hasLogOut = removeUser();
+        /**
+         * 登录
+         * 如果没有预先绑定的话，会登录失败，这时候可以先去公众号上面绑定一下
+         * 如果不想去公众号上面绑定，也可以先调用login()函数，再调用addUser()函数进行绑定
+         * 注意，绑定之后可以调用removeUser()解除绑定，但是没有绑定的情况下调用removeUser()没啥用
+         */
         HashMap<String, String> map = login();
         if (map.get("status") == "0") {
             content = "<div>预约结果：预约失败</div>" + content + "<div>失败原因：初始登录失败</div>";
             SendEmailUtil.sendEmail(EMAIL, content);
             return;
         }
-        Boolean addUser = addUser(map.get("name"), map.get("card"), map.get("deptName"), map.get("gender"), map.get("roleName"));
-        if (!addUser) {
-            content = "<div>预约结果：预约失败</div>" + content + "<div>失败原因：向skalibrary写入用户信息失败</div>";
-            SendEmailUtil.sendEmail(EMAIL, content);
-            return;
-        }
+        /**
+         * 下面几行注释的代码仅当账号没有绑定的时候有用
+         */
+//        Boolean addUser = addUser(map.get("name"), map.get("card"), map.get("deptName"), map.get("gender"), map.get("roleName"));
+//        if (!addUser) {
+//            content = "<div>预约结果：预约失败</div>" + content + "<div>失败原因：绑定失败，请检查学号或密码</div>";
+//            SendEmailUtil.sendEmail(EMAIL, content);
+//            return;
+//        }
         HashMap<String, String> map1 = getViableTime("40", tomorrow);
         if (map1.get("status") == "0") {
             content = "<div>预约结果：预约失败</div>" + content + "<div>失败原因：获取segement参数的过程中失败</div>";
@@ -183,7 +200,16 @@ public class AutoSeatGrabbing {
         }
     }
 
-    // 获取预约历史
+    /**
+     * 获取预约历史
+     * 虽然这里只能查最近10条，但是通过分析，完全可以加入page和count两个参数，从而获取到更多的历史记录
+     * page是当前查询的页数，count是每一页的数量
+     * 在返回的数据中，有一个allpage，这个allpage是按照每页10个数据来算的，所以一共有allpage*10
+     * 有了这些信息，就能分次把所有数据拿到了（但是亲测，每次获取100条数据要花比较长的时间，我用postman测试花了将近30s）
+     * @param accessToken
+     * @param userid
+     * @throws IOException
+     */
     public static void getBookHistory(String accessToken, String userid) throws IOException {
         JSONObject obj = requestGet(BASE_URL + "/profile/books?access_token=" + accessToken + "&userid=" + userid);
         if (obj.getInteger("status") == 1) {
@@ -192,6 +218,47 @@ public class AutoSeatGrabbing {
             System.out.println("error");
         }
     }
+
+    /**
+     * 查询在馆状态
+     * 可以直接输入学号查询，这样就意味着我们可以随意的查别人的学号
+     * @throws IOException
+     */
+    public static void getBookStatus() throws IOException {
+        JSONObject obj = requestGet(BASE_URL + "/wechat_lib_access_check?id=" + USERNAME);
+        switch (obj.getInteger("status")) {
+            case -2:
+                System.out.println("没有入馆");
+                break;
+            case 6:
+                System.out.println("正在使用，双向门禁使用中");
+                break;
+            case 7:
+                System.out.println("临时离开，双向门禁临时离开");
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 设置临时离开
+     * 仅当处于使用状态时，使用临时离开才有用，不然会提示已经临时离开了
+     * @param accessToken
+     * @param bookId
+     * @return
+     * @throws IOException
+     */
+    public static Boolean leave(String accessToken, String bookId) throws IOException {
+        JSONObject obj = requestGet(BASE_URL + "/profile/books/" + bookId + "?_method=leave&access_token=" + accessToken + "&userid=" + USERNAME);
+        if (obj.getInteger("status") == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // 对多个座位进行检查，如果某个座位预约失败，则自动预约下一个座位
 
     // 请求配置
     public static JSONObject requestConfig(String oriUrl, String method, String paramsStr) throws IOException {
@@ -242,4 +309,6 @@ public class AutoSeatGrabbing {
     public static JSONObject requestPost(String oriUrl, String paramsStr) throws IOException {
         return requestConfig(oriUrl, "POST", paramsStr);
     }
+
+
 }
