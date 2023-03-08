@@ -258,10 +258,6 @@ public class AutoSeatGrabbing {
 
     /**
      * 获取预约历史
-     * 虽然这里只能查最近10条，但是通过分析，完全可以加入page和count两个参数，从而获取到更多的历史记录
-     * page是当前查询的页数，count是每一页的数量
-     * 在返回的数据中，有一个allpage，这个allpage是按照每页10个数据来算的，所以一共有allpage*10
-     * 有了这些信息，就能分次把所有数据拿到了（但是亲测，每次获取100条数据要花比较长的时间，我用postman测试花了将近30s）
      * @param accessToken
      * @param userid
      * @throws IOException
@@ -277,11 +273,10 @@ public class AutoSeatGrabbing {
 
     /**
      * 查询在馆状态
-     * 可以直接输入学号查询，这样就意味着我们可以随意的查别人的学号
      * @throws IOException
      */
-    public static void getBookStatus() throws IOException {
-        JSONObject obj = requestGet(BASE_URL + "/wechat_lib_access_check?id=" + USERNAME);
+    public static void getBookStatus(String username) throws IOException {
+        JSONObject obj = requestGet(BASE_URL + "/wechat_lib_access_check?id=" + username);
         switch (obj.getInteger("status")) {
             case -2:
                 System.out.println("没有入馆");
@@ -294,23 +289,6 @@ public class AutoSeatGrabbing {
                 break;
             default:
                 break;
-        }
-    }
-
-    /**
-     * 设置临时离开
-     * 仅当处于使用状态时，使用临时离开才有用，不然会提示已经临时离开了
-     * @param accessToken
-     * @param bookId
-     * @return
-     * @throws IOException
-     */
-    public static Boolean leave(String accessToken, String bookId) throws IOException {
-        JSONObject obj = requestGet(BASE_URL + "/profile/books/" + bookId + "?_method=leave&access_token=" + accessToken + "&userid=" + USERNAME);
-        if (obj.getInteger("status") == 1) {
-            return true;
-        } else {
-            return false;
         }
     }
 
