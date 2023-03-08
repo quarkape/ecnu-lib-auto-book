@@ -124,22 +124,41 @@ public class AutoSeatGrabbing {
         return map;
     }
 
-    // skalibrary绑定用户
+    /**
+     * skalibrary绑定用户
+     * @param name 姓名
+     * @param card 卡号
+     * @param deptName
+     * @param gender
+     * @param roleName
+     * @return
+     * @throws IOException
+     */
     public static Boolean addUser(String name, String card, String deptName, String gender, String roleName) throws IOException {
         String paramsStr = "openid=" + OPENID + "&username=" + USERNAME + "&password=" + PASSWORD + "&name=" + name + "&card=" + card + "&deptName=" + deptName + "&gender=" + gender + "&roleName=" + roleName + "&school=" + SCHOOL + "&schoolName=" + SCHOOL_NAME;
         JSONObject obj = requestPost(SKALIB_URL + "/addUser", paramsStr);
         return obj.getBoolean("status");
     }
 
-    // skalibrary解除绑定
+    /**
+     * skalibrary解除绑定
+     * @return
+     * @throws IOException
+     */
     public static Boolean removeUser() throws IOException {
         JSONObject obj = requestPost(SKALIB_URL + "/removeUser", "openid=" + OPENID);
         return obj.getBoolean("status");
     }
 
-    // 预约
-    // type : 操作类型 : 1 : 预约座位
-    // setId : 座位id : 6056
+    /**
+     * 预约
+     * @param accessToken
+     * @param type
+     * @param segment
+     * @param seatId 座位id,如6056
+     * @return
+     * @throws IOException
+     */
     public static HashMap<String, String> grabSeat(String accessToken, String type, String segment, String seatId) throws IOException {
         String paramStr = "access_token=" + accessToken + "&userid=" + USERNAME + "&type=" + type + "&id=" + seatId + "&segment=" + segment;
         JSONObject obj = requestPost(BASE_URL + "/spaces/" + seatId + "/book", paramStr);
@@ -152,7 +171,11 @@ public class AutoSeatGrabbing {
         return map;
     }
 
-    // 获取图书馆区域信息
+    /**
+     * 获取图书馆区域信息
+     * @return
+     * @throws IOException
+     */
     public static String getAreaInfo() throws IOException {
         JSONObject obj = requestGet(BASE_URL + "/areas?tree=1");
         if (obj.getInteger("status") == 0) {
@@ -162,8 +185,11 @@ public class AutoSeatGrabbing {
         return "error";
     }
 
-    // 获取可预约日期
-    // areaCode: 图书馆区域代码(从getAreaInfo()中获取) : 40 : 中北一楼B区
+    /**
+     * 获取可预约日期
+     * @param areaCode 图书馆区域代码(从getAreaInfo()中获取) : 40 : 中北一楼B区
+     * @throws IOException
+     */
     public static void getViableDate(String areaCode) throws IOException {
         JSONObject obj = requestGet(BASE_URL + "/space_days/" + areaCode);
         if (obj.getInteger("status") == 1) {
@@ -173,8 +199,13 @@ public class AutoSeatGrabbing {
         }
     }
 
-    // 获取可预约时间段
-    // date : 预约日期 : 2023-03-05
+    /**
+     * 获取可预约时间段
+     * @param areaCode
+     * @param date 如2023-03-05
+     * @return
+     * @throws IOException
+     */
     public static HashMap<String, String> getViableTime(String areaCode, String date) throws IOException {
         HashMap<String, String> map = new HashMap<>();
         map.put("status", "0");
@@ -189,9 +220,15 @@ public class AutoSeatGrabbing {
         return map;
     }
 
-    // 获取座位预约信息
-    // endTime : 结束时间 : 23:50
-    // segment : 当天预定id(每天增加1)，需要从getViableTime()中获取 : 142576
+    /**
+     * 获取座位预约信息
+     * @param areaCode
+     * @param date
+     * @param endTime 结束时间，华师大是23:50
+     * @param segment 亲测这个参数不是必须的，可以不用，因为要得到这个参数还需要发起一次其他的请求
+     * @param startTime
+     * @throws IOException
+     */
     public static void getSeatInfo(String areaCode, String date, String endTime, String segment, String startTime) throws IOException {
         JSONObject obj = requestGet(BASE_URL + "/spaces_old?area=" + areaCode + "&day=" + date + "&endTime=" + endTime + "&segment=" + segment + "&startTime=" + startTime);
         if (obj.getInteger("status") == 1) {
@@ -201,8 +238,11 @@ public class AutoSeatGrabbing {
         }
     }
 
-    // 获取空间信息
-    // spaceId : 空间id(从getViableTime()中获取)
+    /**
+     * 获取空间信息
+     * @param spaceId 空间id,从getViableTime()中获取
+     * @throws IOException
+     */
     public static void getAreaInfo(String spaceId) throws IOException {
         JSONObject obj = requestGet(BASE_URL + "/spaces/" + spaceId);
         if (obj.getInteger("status") == 1) {
