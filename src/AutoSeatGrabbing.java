@@ -41,7 +41,7 @@ public class AutoSeatGrabbing {
         autoGrabSeat(SEAT_ID);
 
         // 尝试SEATS_ID数组中的所有座位，直到某个座位预约成功或者全部预约失败
-        bookOneSeat();
+        // bookOneSeat();
     }
 
     /**
