@@ -105,7 +105,11 @@ public class AutoSeatGrabbing {
         return true;
     }
 
-    // 用户登录
+    /**
+     * 用户登录
+     * @return
+     * @throws IOException
+     */
     public static HashMap<String, String> login() throws IOException {
         HashMap<String, String> map = new HashMap<>();
         map.put("status", "0");
@@ -310,7 +314,11 @@ public class AutoSeatGrabbing {
         }
     }
 
-    // 对多个座位进行检查，如果某个座位预约失败，则自动预约下一个座位
+    /**
+     * 对多个座位进行检查，如果某个座位预约失败，则自动预约下一个座位
+     * @return
+     * @throws Exception
+     */
     public static Boolean bookOneSeat() throws Exception {
         for (int i=0;i<SEATS_ID.length;i++) {
             if (!autoGrabSeat(SEATS_ID[i])) {
@@ -322,7 +330,14 @@ public class AutoSeatGrabbing {
         return false;
     }
 
-    // 请求配置
+    /**
+     * 请求配置
+     * @param oriUrl
+     * @param method
+     * @param paramsStr
+     * @return
+     * @throws IOException
+     */
     public static JSONObject requestConfig(String oriUrl, String method, String paramsStr) throws IOException {
         URL url = new URL(oriUrl);
         con = (HttpURLConnection) url.openConnection();
@@ -361,17 +376,31 @@ public class AutoSeatGrabbing {
         return res;
     }
 
-    // GET
+    /**
+     * GET请求
+     * @param oriUrl
+     * @return
+     * @throws IOException
+     */
     public static JSONObject requestGet(String oriUrl) throws IOException {
         return requestConfig(oriUrl, "GET", null);
     }
 
-    // POST
+    /**
+     * POST请求
+     * @param oriUrl
+     * @param paramsStr
+     * @return
+     * @throws IOException
+     */
     public static JSONObject requestPost(String oriUrl, String paramsStr) throws IOException {
         return requestConfig(oriUrl, "POST", paramsStr);
     }
 
-    // 从盛卡恩官网获取所有学校列表
+    /**
+     * 从盛卡恩官网获取所有学校列表
+     * @throws IOException
+     */
     public static void getSchoolList() throws IOException {
         String pathName = "schools.txt";
         int num = 1;
