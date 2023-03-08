@@ -32,6 +32,7 @@ public class AutoSeatGrabbing {
 
     /**
      * 主函数，使用crontab设置定时任务的时候，会默认执行这个函数
+     * 这里面两个语句，选其中一个执行就可以了
      * @param args
      * @throws Exception
      */
