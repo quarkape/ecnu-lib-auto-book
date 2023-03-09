@@ -272,26 +272,6 @@ public class AutoSeatGrabbing {
         }
     }
 
-    /**
-     * 查询在馆状态
-     * @throws IOException
-     */
-    public static void getBookStatus(String username) throws IOException {
-        JSONObject obj = requestGet(BASE_URL + "/wechat_lib_access_check?id=" + username);
-        switch (obj.getInteger("status")) {
-            case -2:
-                System.out.println("没有入馆");
-                break;
-            case 6:
-                System.out.println("正在使用，双向门禁使用中");
-                break;
-            case 7:
-                System.out.println("临时离开，双向门禁临时离开");
-                break;
-            default:
-                break;
-        }
-    }
 
     /**
      * 对多个座位进行检查，如果某个座位预约失败，则自动预约下一个座位
